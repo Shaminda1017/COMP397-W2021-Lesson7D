@@ -16,7 +16,7 @@ public enum CryptoState
 public class CryptoBehaviour : MonoBehaviour
 {
     [Header("Line of Sight")] 
-    public bool HasLOS;
+    public bool HasLOS = false;
 
     public GameObject player;
 
@@ -24,12 +24,14 @@ public class CryptoBehaviour : MonoBehaviour
     private Animator animator;
 
     [Header("Attack")] 
-    public float distance;
+    public float attackDistance;
     public PlayerBehaviour playerBehaviour;
     public float damageDelay = 1.0f;
     public bool isAttacking = false;
     public float kickForce = 0.01f;
-    
+    public float distanceToThePlayer;
+    private float distanceToPlayer;
+
 
 
     // Start is called before the first frame update
@@ -43,13 +45,14 @@ public class CryptoBehaviour : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
         if (HasLOS)
         {
             agent.SetDestination(player.transform.position);
         }
 
 
-        if(HasLOS && Vector3.Distance(transform.position, player.transform.position) < distance && !isAttacking)
+        if(HasLOS && distanceToPlayer < attackDistance && !isAttacking)
         {
                 // could be an attack
             animator.SetInteger("AnimState", (int)CryptoState.KICK);
@@ -63,7 +66,7 @@ public class CryptoBehaviour : MonoBehaviour
                 animator.SetInteger("AnimState", (int)CryptoState.JUMP);
             }       
         }
-        else if (HasLOS)
+        else if (HasLOS = distanceToPlayer > attackDistance)
         {
             animator.SetInteger("AnimState", (int)CryptoState.RUN);
             isAttacking = false;
@@ -86,7 +89,15 @@ public class CryptoBehaviour : MonoBehaviour
     private void DoKickDamage()
     {        
         playerBehaviour.TakeDamage(20);
-        playerBehaviour.controller.SimpleMove(Vector3.forward * kickForce);        
+        StartCoroutine(kickBack());      
+    }
+
+    private IEnumerator kickBack()
+    {
+        yield return new WaitForSeconds(1.0f);        
+        var direction = Vector3.Normalize(player.transform.position - transform.position);
+        playerBehaviour.controller.SimpleMove(direction * kickForce);
+        StopCoroutine(kickBack());
     }
 
 }

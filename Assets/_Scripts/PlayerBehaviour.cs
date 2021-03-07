@@ -81,7 +81,13 @@ public class PlayerBehaviour : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-
+        health -= damage;
+        hitSound.Play();
+        healthBar.TakeDamage(damage);
+        if(health < 0)
+        {
+            health = 0;
+        }
     }
    
 }
