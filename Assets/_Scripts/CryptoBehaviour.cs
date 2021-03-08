@@ -26,7 +26,7 @@ public class CryptoBehaviour : MonoBehaviour
     [Header("Attack")] 
     public float attackDistance;
     public PlayerBehaviour playerBehaviour;
-    public float damageDelay = 1.0f;
+    public float damageDelay = 0.6f;
     public bool isAttacking = false;
     public float kickForce = 0.01f;
     public float distanceToThePlayer;
@@ -94,7 +94,7 @@ public class CryptoBehaviour : MonoBehaviour
 
     private IEnumerator kickBack()
     {
-        yield return new WaitForSeconds(1.0f);        
+        yield return new WaitForSeconds(damageDelay);        
         var direction = Vector3.Normalize(player.transform.position - transform.position);
         playerBehaviour.controller.SimpleMove(direction * kickForce);
         StopCoroutine(kickBack());
